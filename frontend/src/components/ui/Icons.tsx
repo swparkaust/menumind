@@ -7,11 +7,21 @@ interface IconProps extends HTMLAttributes<SVGElement> {
   color?: string;
 }
 
-function getIconSize(size: number | ResponsiveIconSize): string {
+function getIconSize(size: number | ResponsiveIconSize): number {
   if (typeof size === 'number') {
-    return `${size}px`;
+    return size;
   }
-  return `var(--icon-${size})`;
+  
+  const sizeMap: Record<ResponsiveIconSize, number> = {
+    'xs': 12,
+    'sm': 14, 
+    'md': 16,
+    'lg': 18,
+    'xl': 20,
+    '2xl': 36
+  };
+  
+  return sizeMap[size];
 }
 
 export const ChevronDownIcon = ({ size = 'md', color = 'currentColor', ...props }: IconProps) => {

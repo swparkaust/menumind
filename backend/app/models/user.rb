@@ -16,6 +16,7 @@ class User < ApplicationRecord
       .group("users.id")
       .having("COALESCE(MAX(menu_recommendations.recommended_at), users.created_at) < ?", date)
   }
+  scope :admins, -> { where(is_admin: true) }
 
   def recent_recommendations(limit = 10)
     menu_recommendations

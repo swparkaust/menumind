@@ -13,6 +13,7 @@ import { SkeletonCard } from '@/components/ui/Skeleton';
 import { DebugPanel } from '@/components/DebugPanel';
 import { HealthStatus } from '@/components/HealthStatus';
 import { AdPlacements } from '@/components/AdPlacements';
+import { AdminPanel } from '@/components/AdminPanel';
 import { AppIcon, RefreshIcon, TrashIcon } from '@/components/ui/Icons';
 import { PullToRefresh } from '@/components/ui/PullToRefresh';
 import { ApiService, MenuRecommendation, MenuOptions } from '@/lib/api';
@@ -375,6 +376,7 @@ export default function Home() {
 
         <AdPlacements position="secondary" />
         
+        {userUuid && <AdminPanel userUuid={userUuid} />}
         <DebugPanel />
         <HealthStatus />
       </div>

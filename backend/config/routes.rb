@@ -28,6 +28,12 @@ Rails.application.routes.draw do
           end
         end
       end
+
+      scope "/admin/:user_uuid" do
+        get :cleanup_status, controller: "admin"
+        post :cleanup_run, controller: "admin"
+        get :verify, controller: "admin"
+      end
     end
   end
 end

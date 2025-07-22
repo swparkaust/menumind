@@ -74,6 +74,20 @@ export interface MenuOptions {
   situations: MenuOption[];
 }
 
+export interface CleanupStatus {
+  total_users: number;
+  inactive_threshold_days: number;
+  inactive_since: string;
+  users_eligible_for_cleanup: number;
+  last_cleanup_at: string | null;
+}
+
+export interface CleanupResult {
+  inactive_since: string;
+  users_found: number;
+  users_deleted: number;
+}
+
 export class ApiService {
   static async getMenuOptions(lang: string = 'ko'): Promise<MenuOptions> {
     return withRetry(async () => {
@@ -181,5 +195,26 @@ export class ApiService {
       }),
       2 * 60 * 1000 // Cache insights for 2 minutes
     );
+  }
+
+  static async verifyAdmin(userUuid: string): Promise<{ is_admin: boolean; uuid: string }> {
+    return withRetry(async () => {
+      const response = await api.get(`/admin/${userUuid}/verify`);
+      return response.data;
+    });
+  }
+
+  static async getCleanupStatus(userUuid: string): Promise<CleanupStatus> {
+    return withRetry(async () => {
+      const response = await api.get(`/admin/${userUuid}/cleanup_status`);
+      return response.data;
+    });
+  }
+
+  static async runCleanup(userUuid: string): Promise<CleanupResult> {
+    return withRetry(async () => {
+      const response = await api.post(`/admin/${userUuid}/cleanup_run`);
+      return response.data;
+    }, { maxAttempts: 1 });
   }
 }

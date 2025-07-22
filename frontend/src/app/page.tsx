@@ -1,10 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { PersonalizedGreeting } from '@/components/PersonalizedGreeting';
+import { useState, useEffect, useRef } from 'react';
+import { PersonalizedGreeting, PersonalizedGreetingRef } from '@/components/PersonalizedGreeting';
 import { RecommendationCard } from '@/components/RecommendationCard';
 import { PreferenceSelector } from '@/components/PreferenceSelector';
-import { InsightsDashboard } from '@/components/InsightsDashboard';
+import { InsightsDashboard, InsightsDashboardRef } from '@/components/InsightsDashboard';
 import { PWAInstallPrompt } from '@/components/PWAInstallPrompt';
 import { Button } from '@/components/ui/Button';
 import { ConfirmationDialog } from '@/components/ui/ConfirmationDialog';
@@ -14,6 +14,7 @@ import { DebugPanel } from '@/components/DebugPanel';
 import { HealthStatus } from '@/components/HealthStatus';
 import { AdPlacements } from '@/components/AdPlacements';
 import { AppIcon, RefreshIcon, TrashIcon } from '@/components/ui/Icons';
+import { PullToRefresh } from '@/components/ui/PullToRefresh';
 import { ApiService, MenuRecommendation, MenuOptions } from '@/lib/api';
 import { MenuOptionsHelper } from '@/lib/menuOptions';
 import { StorageService } from '@/lib/storage';
@@ -34,6 +35,9 @@ export default function Home() {
   const [clearing, setClearing] = useState(false);
   const [menuOptions, setMenuOptions] = useState<MenuOptions | null>(null);
   const { showError, showSuccess } = useToast();
+  
+  const greetingRef = useRef<PersonalizedGreetingRef>(null);
+  const insightsRef = useRef<InsightsDashboardRef>(null);
 
   useEffect(() => {
     initializeUser();
@@ -85,7 +89,7 @@ export default function Home() {
     }
   };
 
-  const generateRecommendation = async () => {
+  const generateRecommendation = async (): Promise<void> => {
     if (!userUuid) return;
 
     try {
@@ -144,6 +148,22 @@ export default function Home() {
     }
   };
 
+  const handleRefresh = async () => {
+    const promises: Promise<void>[] = [];
+    
+    if (greetingRef.current) {
+      promises.push(greetingRef.current.refresh());
+    }
+    
+    if (insightsRef.current) {
+      promises.push(insightsRef.current.refresh());
+    }
+    
+    promises.push(generateRecommendation());
+    
+    await Promise.all(promises);
+  };
+
   const handleClearData = async () => {
     if (!userUuid) return;
 
@@ -185,23 +205,24 @@ export default function Home() {
   }
 
   return (
-    <main id="main-content" className="px-4 sm:px-6 lg:px-8" style={{
-      minHeight: '100vh',
-      paddingTop: 'var(--spacing-lg)',
-      paddingBottom: 'max(var(--spacing-lg), env(safe-area-inset-bottom))',
-      width: '100%',
-      display: 'flex',
-      justifyContent: 'center'
-    }} role="main" aria-label="MenuMind 메뉴 추천 앱">
-      <div
-        className="max-w-sm sm:max-w-md md:max-w-lg lg:max-w-2xl xl:max-w-4xl 2xl:max-w-6xl"
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 'var(--spacing-lg)',
-          width: '100%'
-        }}
-      >
+    <PullToRefresh onRefresh={handleRefresh} disabled={loading || generating}>
+      <main id="main-content" className="px-4 sm:px-6 lg:px-8" style={{
+        minHeight: '100vh',
+        paddingTop: 'var(--spacing-lg)',
+        paddingBottom: 'max(var(--spacing-lg), env(safe-area-inset-bottom))',
+        width: '100%',
+        display: 'flex',
+        justifyContent: 'center'
+      }} role="main" aria-label="MenuMind 메뉴 추천 앱">
+        <div
+          className="max-w-sm sm:max-w-md md:max-w-lg lg:max-w-2xl xl:max-w-4xl 2xl:max-w-6xl"
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 'var(--spacing-lg)',
+            width: '100%'
+          }}
+        >
         <header className="text-center animate-native-fade-in" style={{ paddingTop: 'var(--spacing-2xl)', paddingBottom: 'var(--spacing-xl)' }}>
           <div className="flex items-center justify-center gap-3 mb-3">
             <div className="w-9 h-9 sm:w-10 sm:h-10 lg:w-12 lg:h-12">
@@ -234,6 +255,7 @@ export default function Home() {
             <PWAInstallPrompt />
 
             <PersonalizedGreeting
+              ref={greetingRef}
               userUuid={userUuid}
               foodType={foodType}
               cuisineType={cuisineType}
@@ -286,7 +308,7 @@ export default function Home() {
               </>
             ) : null}
 
-            <InsightsDashboard userUuid={userUuid} />
+            <InsightsDashboard ref={insightsRef} userUuid={userUuid} />
 
             <div className="text-center" style={{ paddingTop: 'var(--spacing-2xl)' }}>
               <Button
@@ -321,5 +343,6 @@ export default function Home() {
         <HealthStatus />
       </div>
     </main>
+  </PullToRefresh>
   );
 }

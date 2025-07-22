@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useImperativeHandle, forwardRef } from 'react';
 import { Card, CardHeader, CardContent } from './ui/Card';
 import { Button } from './ui/Button';
 import { SkeletonInsights } from './ui/Skeleton';
@@ -11,24 +11,32 @@ interface InsightsDashboardProps {
   userUuid: string;
 }
 
-export function InsightsDashboard({ userUuid }: InsightsDashboardProps) {
+export interface InsightsDashboardRef {
+  refresh: () => Promise<void>;
+}
+
+export const InsightsDashboard = forwardRef<InsightsDashboardRef, InsightsDashboardProps>(({ userUuid }, ref) => {
   const [insights, setInsights] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAll, setShowAll] = useState(false);
 
-  useEffect(() => {
-    const fetchInsights = async () => {
-      try {
-        setLoading(true);
-        const response = await ApiService.getInsights(userUuid);
-        setInsights(response.insights);
-      } catch {
-        setInsights(['아직 충분한 데이터가 없습니다. 더 많은 추천을 시도해보세요!']);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchInsights = async () => {
+    try {
+      setLoading(true);
+      const response = await ApiService.getInsights(userUuid);
+      setInsights(response.insights);
+    } catch {
+      setInsights(['아직 충분한 데이터가 없습니다. 더 많은 추천을 시도해보세요!']);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useImperativeHandle(ref, () => ({
+    refresh: fetchInsights
+  }));
+
+  useEffect(() => {
     if (userUuid) {
       fetchInsights();
     }
@@ -88,4 +96,6 @@ export function InsightsDashboard({ userUuid }: InsightsDashboardProps) {
       </CardContent>
     </Card>
   );
-}
+});
+
+InsightsDashboard.displayName = 'InsightsDashboard';

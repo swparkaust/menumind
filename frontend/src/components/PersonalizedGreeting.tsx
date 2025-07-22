@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useImperativeHandle, forwardRef } from 'react';
 import { Card, CardContent } from './ui/Card';
 import { SkeletonText } from './ui/Skeleton';
 import { SparklesIcon } from './ui/Icons';
@@ -13,32 +13,40 @@ interface PersonalizedGreetingProps {
   situation: string;
 }
 
-export function PersonalizedGreeting({ 
+export interface PersonalizedGreetingRef {
+  refresh: () => Promise<void>;
+}
+
+export const PersonalizedGreeting = forwardRef<PersonalizedGreetingRef, PersonalizedGreetingProps>(({ 
   userUuid, 
   foodType, 
   cuisineType, 
   situation 
-}: PersonalizedGreetingProps) {
+}, ref) => {
   const [greeting, setGreeting] = useState<string>('');
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchGreeting = async () => {
-      try {
-        setLoading(true);
-        const response = await ApiService.getGreeting(userUuid, {
-          food_type: foodType,
-          cuisine_type: cuisineType,
-          situation: situation,
-        });
-        setGreeting(response.greeting);
-      } catch {
-        setGreeting('안녕하세요! 오늘은 어떤 음식을 드시고 싶으신가요?');
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchGreeting = async () => {
+    try {
+      setLoading(true);
+      const response = await ApiService.getGreeting(userUuid, {
+        food_type: foodType,
+        cuisine_type: cuisineType,
+        situation: situation,
+      });
+      setGreeting(response.greeting);
+    } catch {
+      setGreeting('안녕하세요! 오늘은 어떤 음식을 드시고 싶으신가요?');
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useImperativeHandle(ref, () => ({
+    refresh: fetchGreeting
+  }));
+
+  useEffect(() => {
     if (userUuid) {
       fetchGreeting();
     }
@@ -65,4 +73,6 @@ export function PersonalizedGreeting({
       </CardContent>
     </Card>
   );
-}
+});
+
+PersonalizedGreeting.displayName = 'PersonalizedGreeting';

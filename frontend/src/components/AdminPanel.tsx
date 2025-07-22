@@ -34,8 +34,6 @@ export const AdminPanel = ({ userUuid }: AdminPanelProps) => {
   };
 
   const fetchStatus = async () => {
-    if (!isAdmin) return;
-    
     try {
       setLoading(true);
       const response = await ApiService.getCleanupStatus(userUuid);

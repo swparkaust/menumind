@@ -242,7 +242,8 @@ export default function Home() {
   }
 
   return (
-    <PullToRefresh onRefresh={handleRefresh} disabled={loading || generating}>
+    <>
+      <PullToRefresh onRefresh={handleRefresh} disabled={loading || generating}>
       <main id="main-content" className="px-4 sm:px-6 lg:px-8" style={{
         minHeight: '100vh',
         paddingTop: 'var(--spacing-lg)',
@@ -362,17 +363,6 @@ export default function Home() {
           </>
         )}
 
-        <ConfirmationDialog
-          isOpen={showClearDialog}
-          onClose={() => setShowClearDialog(false)}
-          onConfirm={handleClearData}
-          title="데이터 삭제"
-          message="모든 추천 기록과 사용자 데이터가 삭제됩니다. 이 작업은 되돌릴 수 없습니다."
-          confirmText="삭제"
-          cancelText="취소"
-          dangerous={true}
-          loading={clearing}
-        />
 
         <AdPlacements position="secondary" />
         
@@ -382,5 +372,18 @@ export default function Home() {
       </div>
     </main>
   </PullToRefresh>
+      
+      <ConfirmationDialog
+        isOpen={showClearDialog}
+        onClose={() => setShowClearDialog(false)}
+        onConfirm={handleClearData}
+        title="데이터 삭제"
+        message="모든 추천 기록과 사용자 데이터가 삭제됩니다. 이 작업은 되돌릴 수 없습니다."
+        confirmText="삭제"
+        cancelText="취소"
+        dangerous={true}
+        loading={clearing}
+      />
+    </>
   );
 }

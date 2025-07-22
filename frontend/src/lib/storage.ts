@@ -1,6 +1,7 @@
 export class StorageService {
   private static readonly USER_UUID_KEY = 'food_menu_user_uuid';
   private static readonly PREFERENCES_KEY = 'food_menu_preferences';
+  private static readonly LAST_TIMEZONE_KEY = 'food_menu_last_timezone';
 
   static getUserUuid(): string | null {
     if (typeof window === 'undefined') return null;
@@ -32,10 +33,27 @@ export class StorageService {
     if (typeof window === 'undefined') return;
     localStorage.removeItem(this.USER_UUID_KEY);
     localStorage.removeItem(this.PREFERENCES_KEY);
+    localStorage.removeItem(this.LAST_TIMEZONE_KEY);
   }
 
   static getUserTimezone(): string {
     return Intl.DateTimeFormat().resolvedOptions().timeZone;
+  }
+
+  static getLastKnownTimezone(): string | null {
+    if (typeof window === 'undefined') return null;
+    return localStorage.getItem(this.LAST_TIMEZONE_KEY);
+  }
+
+  static setLastKnownTimezone(timezone: string): void {
+    if (typeof window === 'undefined') return;
+    localStorage.setItem(this.LAST_TIMEZONE_KEY, timezone);
+  }
+
+  static hasTimezoneChanged(): boolean {
+    const currentTimezone = this.getUserTimezone();
+    const lastKnownTimezone = this.getLastKnownTimezone();
+    return lastKnownTimezone !== currentTimezone;
   }
 
   static getSystemLanguage(): string {

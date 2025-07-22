@@ -68,6 +68,7 @@ export default function Home() {
         const { uuid: newUuid } = await ApiService.createUser(timezone);
         uuid = newUuid;
         StorageService.setUserUuid(uuid);
+        StorageService.setLastKnownTimezone(timezone);
 
         // Request location permission and update user
         const location = await LocationService.getCurrentLocation();
@@ -77,6 +78,9 @@ export default function Home() {
             location_lng: location.lng,
           });
         }
+      } else {
+        // For existing users, check and update timezone and location
+        await updateUserLocationAndTimezone(uuid);
       }
 
       setUserUuid(uuid);
@@ -86,6 +90,33 @@ export default function Home() {
       showError(errorInfo.title, errorInfo.message);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const updateUserLocationAndTimezone = async (uuid: string) => {
+    try {
+      const updateData: any = {};
+      
+      // Check if timezone has changed
+      if (StorageService.hasTimezoneChanged()) {
+        const currentTimezone = StorageService.getUserTimezone();
+        updateData.timezone = currentTimezone;
+        StorageService.setLastKnownTimezone(currentTimezone);
+      }
+
+      // Always try to get fresh location data
+      const location = await LocationService.getCurrentLocation();
+      if (location) {
+        updateData.location_lat = location.lat;
+        updateData.location_lng = location.lng;
+      }
+
+      // Only make API call if there's data to update
+      if (Object.keys(updateData).length > 0) {
+        await ApiService.updateUser(uuid, updateData);
+      }
+    } catch (error) {
+      // Silent failure - don't show error to user for background updates
     }
   };
 

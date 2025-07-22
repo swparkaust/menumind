@@ -10,25 +10,25 @@ class MenuRecommendation < ApplicationRecord
   scope :accepted, -> { where(accepted: true) }
   scope :declined, -> { where(declined: true) }
   scope :pending, -> { where(accepted: false, declined: false) }
-  scope :recent, -> { where('recommended_at > ?', 1.week.ago) }
+  scope :recent, -> { where("recommended_at > ?", 1.week.ago) }
 
   def respond_to_recommendation(accept, response_context = nil)
     update_attributes = {
       responded_at: Time.current
     }
-    
+
     if accept
       update_attributes[:accepted] = true
     else
       update_attributes[:declined] = true
     end
-    
+
     # Update context with response context if provided
     if response_context
       current_context = context || {}
       update_attributes[:context] = current_context.merge(response_context: response_context)
     end
-    
+
     update!(update_attributes)
   end
 

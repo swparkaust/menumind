@@ -6,20 +6,20 @@ class ApplicationController < ActionController::API
   private
 
   def render_not_found(exception)
-    render json: { error: 'Resource not found', details: exception.message }, status: :not_found
+    render json: { error: "Resource not found", details: exception.message }, status: :not_found
   end
 
   def render_unprocessable_entity(exception)
-    render json: { error: 'Validation failed', details: exception.record.errors }, status: :unprocessable_entity
+    render json: { error: "Validation failed", details: exception.record.errors }, status: :unprocessable_entity
   end
 
   def render_internal_server_error(exception)
     Rails.logger.error "Internal server error: #{exception.message}"
     Rails.logger.error exception.backtrace.join("\n")
-    
-    render json: { 
-      error: 'Internal server error', 
-      details: Rails.env.development? ? exception.message : 'Something went wrong'
+
+    render json: {
+      error: "Internal server error",
+      details: Rails.env.development? ? exception.message : "Something went wrong"
     }, status: :internal_server_error
   end
 end

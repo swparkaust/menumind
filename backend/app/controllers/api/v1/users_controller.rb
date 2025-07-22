@@ -1,5 +1,5 @@
 class Api::V1::UsersController < ApplicationController
-  before_action :find_or_create_user, only: [:show, :update]
+  before_action :find_or_create_user, only: [ :show, :update ]
 
   def show
     render json: {
@@ -11,8 +11,8 @@ class Api::V1::UsersController < ApplicationController
 
   def create
     user = User.new(user_params)
-    user.timezone = params[:timezone] || 'Asia/Seoul'
-    
+    user.timezone = params[:timezone] || "Asia/Seoul"
+
     if user.save
       render json: { uuid: user.uuid }, status: :created
     else
@@ -22,7 +22,7 @@ class Api::V1::UsersController < ApplicationController
 
   def update
     if @user.update(user_params)
-      render json: { message: 'User updated successfully' }
+      render json: { message: "User updated successfully" }
     else
       render json: { errors: @user.errors }, status: :unprocessable_entity
     end
@@ -30,17 +30,17 @@ class Api::V1::UsersController < ApplicationController
 
   def destroy
     @user = User.find_by(uuid: params[:uuid])
-    return render json: { error: 'User not found' }, status: :not_found unless @user
+    return render json: { error: "User not found" }, status: :not_found unless @user
 
     @user.destroy
-    render json: { message: 'All data cleared successfully' }
+    render json: { message: "All data cleared successfully" }
   end
 
   private
 
   def find_or_create_user
     @user = User.find_by(uuid: params[:uuid])
-    return render json: { error: 'User not found' }, status: :not_found unless @user
+    render json: { error: "User not found" }, status: :not_found unless @user
   end
 
   def user_params

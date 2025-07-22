@@ -15,7 +15,7 @@ class CreateMenuRecommendations < ActiveRecord::Migration[8.0]
       t.timestamps
     end
 
-    add_index :menu_recommendations, [:user_id, :recommended_at]
+    add_index :menu_recommendations, [ :user_id, :recommended_at ]
     add_index :menu_recommendations, :menu_name
   end
 end

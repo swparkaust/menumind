@@ -7,18 +7,18 @@ Rails.application.routes.draw do
 
   namespace :api do
     namespace :v1 do
-      resources :users, param: :uuid, only: [:show, :create, :update, :destroy]
-      
-      resources :menu_options, only: [:index] do
+      resources :users, param: :uuid, only: [ :show, :create, :update, :destroy ]
+
+      resources :menu_options, only: [ :index ] do
         collection do
           get :food_types
           get :cuisine_types
           get :situations
         end
       end
-      
-      scope '/users/:user_uuid' do
-        resources :recommendations, only: [:index, :create] do
+
+      scope "/users/:user_uuid" do
+        resources :recommendations, only: [ :index, :create ] do
           member do
             patch :respond
           end

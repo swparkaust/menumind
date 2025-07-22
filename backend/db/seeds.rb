@@ -2,7 +2,7 @@
 
 if Rails.env.development?
   Rails.logger.info "Creating sample user..."
-  
+
   # Create a sample user
   user = User.find_or_create_by(uuid: 'sample-user-uuid-123') do |u|
     u.timezone = 'Asia/Seoul'
@@ -16,7 +16,7 @@ if Rails.env.development?
   end
 
   Rails.logger.info "Creating sample recommendations..."
-  
+
   # Create some sample recommendations
   sample_recommendations = [
     {
@@ -60,7 +60,7 @@ if Rails.env.development?
   end
 
   Rails.logger.info "Creating sample insights..."
-  
+
   # Create sample user insights
   user.user_insights.find_or_create_by(insight_type: 'preference_analysis') do |insight|
     insight.insight_data = {

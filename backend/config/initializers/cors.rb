@@ -7,7 +7,7 @@
 
 Rails.application.config.middleware.insert_before 0, Rack::Cors do
   allow do
-    origins ENV['FRONTEND_URL'] || "http://localhost:3000",
+    origins ENV["FRONTEND_URL"] || "http://localhost:3000",
             "localhost:3000",
             "127.0.0.1:3000",
             "http://localhost:3001",
@@ -15,7 +15,7 @@ Rails.application.config.middleware.insert_before 0, Rack::Cors do
 
     resource "*",
       headers: :any,
-      methods: [:get, :post, :put, :patch, :delete, :options, :head],
+      methods: [ :get, :post, :put, :patch, :delete, :options, :head ],
       credentials: true
   end
 end

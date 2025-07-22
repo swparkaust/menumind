@@ -3,12 +3,12 @@ class AiService
     @provider ||= GeminiProvider.new
   end
 
-  def self.generate_recommendation(user, food_type: 'all', cuisine_type: 'all', situation: 'all')
+  def self.generate_recommendation(user, food_type: "all", cuisine_type: "all", situation: "all")
     context = build_recommendation_context(user, food_type, cuisine_type, situation)
     provider.generate_recommendation(context)
   end
 
-  def self.generate_greeting(user, food_type: 'all', cuisine_type: 'all', situation: 'all')
+  def self.generate_greeting(user, food_type: "all", cuisine_type: "all", situation: "all")
     context = build_greeting_context(user)
     provider.generate_greeting(context, food_type, cuisine_type, situation)
   end

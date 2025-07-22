@@ -4,7 +4,7 @@ export interface LocationCoords {
 }
 
 export class LocationService {
-  static async getCurrentLocation(): Promise<LocationCoords | null> {
+  static async getCurrentLocation(maximumAge: number = 300000): Promise<LocationCoords | null> {
     if (!navigator.geolocation) {
       return null;
     }
@@ -23,7 +23,7 @@ export class LocationService {
         {
           enableHighAccuracy: true,
           timeout: 10000,
-          maximumAge: 300000, // 5 minutes
+          maximumAge,
         }
       );
     });

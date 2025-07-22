@@ -106,6 +106,12 @@ export class ApiService {
     
     // Invalidate user cache after update
     apiCache.invalidate(createCacheKey(`/users/${uuid}`));
+    
+    // If location data changed, invalidate insights cache as it depends on location
+    if (data.location_lat !== undefined || data.location_lng !== undefined) {
+      apiCache.invalidate(createCacheKey(`/users/${uuid}/recommendations/insights`));
+    }
+    
     return result;
   }
 

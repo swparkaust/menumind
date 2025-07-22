@@ -93,7 +93,7 @@ export default function Home() {
     }
   };
 
-  const updateUserLocationAndTimezone = async (uuid: string) => {
+  const updateUserLocationAndTimezone = async (uuid: string, forceRefreshLocation: boolean = false) => {
     try {
       const updateData: any = {};
       
@@ -104,8 +104,9 @@ export default function Home() {
         StorageService.setLastKnownTimezone(currentTimezone);
       }
 
-      // Always try to get fresh location data
-      const location = await LocationService.getCurrentLocation();
+      // Get location data with shorter cache for force refresh scenarios
+      const locationMaxAge = forceRefreshLocation ? 60000 : 300000; // 1 minute vs 5 minutes
+      const location = await LocationService.getCurrentLocation(locationMaxAge);
       if (location) {
         updateData.location_lat = location.lat;
         updateData.location_lng = location.lng;
@@ -180,6 +181,10 @@ export default function Home() {
   };
 
   const handleRefresh = async () => {
+    if (userUuid) {
+      await updateUserLocationAndTimezone(userUuid, true);
+    }
+    
     const promises: Promise<void>[] = [];
     
     if (greetingRef.current) {

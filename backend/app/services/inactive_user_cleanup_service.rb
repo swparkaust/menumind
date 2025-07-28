@@ -37,6 +37,9 @@ class InactiveUserCleanupService
 
     Rails.logger.info "Completed inactive user cleanup. Deleted #{deleted_count} users"
 
+    # Store cleanup completion time in cache
+    Rails.cache.write('last_inactive_user_cleanup_time', Time.current, expires_in: 1.year)
+
     {
       inactive_since: inactive_since,
       users_found: users_found_count,
@@ -64,24 +67,7 @@ class InactiveUserCleanupService
   private
 
   def fetch_last_cleanup_time
-    log_pattern = "Completed inactive user cleanup"
-    log_file_path = Rails.root.join("log", "#{Rails.env}.log")
-    
-    return nil unless File.exist?(log_file_path)
-    
-    last_cleanup_line = nil
-    File.foreach(log_file_path).reverse_each do |line|
-      if line.include?(log_pattern)
-        last_cleanup_line = line
-        break
-      end
-    end
-    
-    return nil unless last_cleanup_line
-    
-    timestamp_match = last_cleanup_line.match(/(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d+Z)/)
-    timestamp_match ? DateTime.parse(timestamp_match[1]) : nil
-  rescue
-    nil
+    # Fetch from cache instead of log file
+    Rails.cache.read('last_inactive_user_cleanup_time')
   end
 end

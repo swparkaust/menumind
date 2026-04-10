@@ -25,7 +25,7 @@ MenuMind is a smart, AI-powered food recommendation web application that suggest
 1. **Clone the repository**
    ```bash
    git clone https://github.com/swparkaust/menumind.git
-   cd food-menu-app
+   cd menumind
    ```
 
 2. **Setup Backend**
